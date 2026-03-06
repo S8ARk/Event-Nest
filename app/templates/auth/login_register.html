@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .auth-container {
+        max-width: 500px;
+        margin: 0 auto;
+    }
+
+    .form-error {
+        color: var(--danger);
+        font-size: 0.85rem;
+        margin-top: 0.25rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="card">
+        <h2 style="margin-bottom: 1.5rem; text-align: center;">{{ title }}</h2>
+
+        <form method="POST" action="">
+            {{ form.hidden_tag() }}
+
+            {% if mode == 'register' %}
+            <div class="form-group">
+                {{ form.name.label }}
+                {{ form.name(class="form-control") }}
+                {% for error in form.name.errors %}
+                <div class="form-error">{{ error }}</div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <div class="form-group">
+                {{ form.email.label }}
+                {{ form.email(class="form-control") }}
+                {% for error in form.email.errors %}
+                <div class="form-error">{{ error }}</div>
+                {% endfor %}
+            </div>
+
+            <div class="form-group">
+                {{ form.password.label }}
+                {{ form.password(class="form-control") }}
+                {% for error in form.password.errors %}
+                <div class="form-error">{{ error }}</div>
+                {% endfor %}
+            </div>
+
+            {% if mode == 'register' %}
+            <div class="form-group">
+                {{ form.confirm_password.label }}
+                {{ form.confirm_password(class="form-control") }}
+                {% for error in form.confirm_password.errors %}
+                <div class="form-error">{{ error }}</div>
+                {% endfor %}
+            </div>
+
+            <div class="form-group">
+                {{ form.role.label }}
+                {{ form.role(class="form-control") }}
+            </div>
+            {% endif %}
+
+            {% if mode == 'login' %}
+            <div class="form-group" style="display: flex; align-items: center; gap: 0.5rem;">
+                {{ form.remember() }}
+                {{ form.remember.label }}
+            </div>
+            {% endif %}
+
+            <div style="margin-top: 1.5rem;">
+                {{ form.submit(class="btn", style="width: 100%;") }}
+            </div>
+        </form>
+
+        <div style="text-align: center; margin-top: 1.5rem; font-size: 0.9rem;">
+            {% if mode == 'login' %}
+            <p>Don't have an account? <a href="{{ url_for('auth.register') }}" style="color: var(--primary-color);">Sign
+                    Up</a></p>
+            {% else %}
+            <p>Already have an account? <a href="{{ url_for('auth.login') }}" style="color: var(--primary-color);">Log
+                    In</a></p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

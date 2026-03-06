@@ -1,0 +1,28 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Environment variables
+.env
+
+# Virtual environment
+venv/
+
+# Flask instance folder (contains local DB like cers.db)
+instance/
+
+# Testing cache
+.pytest_cache/
+.coverage
+
+# Specific local test output files to ignore
+fix_test.txt
+test_final.txt
+test_final_out.txt
+test_out.txt
+test_out_final.txt
+
+# OS generated files
+.DS_Store
+Thumbs.db

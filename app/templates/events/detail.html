@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+
+{% block title %}{{ event.title }}{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 900px;">
+
+    <!-- Header Section -->
+    <div class="card" style="margin-bottom: 2rem;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+            <div>
+                <span
+                    style="display: inline-block; padding: 0.25rem 0.75rem; background-color: var(--info); color: white; border-radius: 4px; font-size: 0.85rem; font-weight: bold; margin-bottom: 1rem;">
+                    {{ event.category.name }}
+                </span>
+                <h1 style="color: var(--secondary-color); margin-bottom: 0.5rem; font-size: 2.5rem;">{{ event.title }}
+                </h1>
+                <p style="color: var(--text-light); font-size: 1.1rem;">By {{ event.organizer.name }}</p>
+            </div>
+
+            <!-- Organizer Controls -->
+            {% if current_user.is_authenticated and (current_user.id == event.organizer_id or current_user.role ==
+            'admin') %}
+            <div style="display: flex; gap: 0.5rem;">
+                <a href="{{ url_for('events.edit', event_id=event.id) }}" class="btn"
+                    style="background-color: var(--warning); color: #333;">Edit</a>
+                <form action="{{ url_for('events.delete', event_id=event.id) }}" method="POST"
+                    onsubmit="return confirm('Are you sure you want to archive this event?');">
+                    <button type="submit" class="btn" style="background-color: var(--danger);">Archive</button>
+                </form>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Details Grid -->
+    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 2rem;">
+
+        <!-- Left Column: Description -->
+        <div class="card">
+            <h3
+                style="margin-bottom: 1.5rem; border-bottom: 2px solid var(--primary-color); padding-bottom: 0.5rem; display: inline-block;">
+                About This Event</h3>
+
+            <div style="line-height: 1.8; font-size: 1.05rem; white-space: pre-wrap;">{{ event.description }}</div>
+
+            <!-- Module 5 NLP Keywords Visualization Placeholder -->
+            {% if event.keywords %}
+            <div style="margin-top: 2rem; padding-top: 2rem; border-top: 1px solid #eee;">
+                <h4 style="color: var(--text-light); margin-bottom: 0.5rem; font-size: 0.9rem;">NLP Extracted Keywords:
+                </h4>
+                <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
+                    {% for keyword in event.keywords.split(',') %}
+                    <span
+                        style="background-color: #eee; padding: 0.2rem 0.6rem; border-radius: 12px; font-size: 0.8rem; color: #555;">{{
+                        keyword }}</span>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Right Column: Logistics -->
+        <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+
+            <!-- Info Card -->
+            <div class="card" style="padding: 1.5rem;">
+                <h3
+                    style="margin-bottom: 1.5rem; border-bottom: 2px solid var(--primary-color); padding-bottom: 0.5rem;">
+                    Logistics</h3>
+
+                <div style="margin-bottom: 1rem; display: flex; align-items: center; gap: 1rem;">
+                    <span style="font-size: 1.5rem;">📅</span>
+                    <div>
+                        <strong>Date</strong>
+                        <div style="color: var(--text-light);">{{ event.date.strftime('%A, %B %d, %Y') }}</div>
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 1rem; display: flex; align-items: center; gap: 1rem;">
+                    <span style="font-size: 1.5rem;">⏰</span>
+                    <div>
+                        <strong>Time</strong>
+                        <div style="color: var(--text-light);">{{ event.time.strftime('%I:%M %p') }}</div>
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 1rem; display: flex; align-items: center; gap: 1rem;">
+                    <span style="font-size: 1.5rem;">📍</span>
+                    <div>
+                        <strong>Location</strong>
+                        <div style="color: var(--text-light);">{{ event.location }}</div>
+                    </div>
+                </div>
+
+                <div style="display: flex; align-items: center; gap: 1rem;">
+                    <span style="font-size: 1.5rem;">👥</span>
+                    <div>
+                        <strong>Capacity</strong>
+                        <div style="color: var(--text-light);">
+                            <!-- Attendance count to be injected in Module 4 -->
+                            0 / {{ event.max_capacity if event.max_capacity else 'Unlimited' }} Registered
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Registration Card (Module 4 Placeholder) -->
+            <div class="card"
+                style="padding: 1.5rem; text-align: center; background-color: var(--primary-color); color: white;">
+                <h3 style="margin-bottom: 1rem;">Ready to Join?</h3>
+                <p style="margin-bottom: 1.5rem; font-size: 0.9rem; opacity: 0.9;">Registration features will be
+                    unlocked in Module 4.</p>
+                <button class="btn"
+                    style="background-color: white; color: var(--primary-color); width: 100%; cursor: not-allowed;"
+                    disabled>Module 4 Restricted</button>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+{% endblock %}

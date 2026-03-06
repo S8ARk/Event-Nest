@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block title %}Create/Edit Event{% endblock %}
+
+{% block content %}
+<div class="card" style="max-width: 800px; margin: 0 auto;">
+    <h2 style="margin-bottom: 1.5rem;">{{ title }}</h2>
+
+    <form method="POST" action="">
+        {{ form.hidden_tag() }}
+
+        <div class="form-group">
+            {{ form.title.label(style="font-weight: 600; display: block; margin-bottom: 0.5rem;") }}
+            {{ form.title(class="form-control") }}
+            {% for error in form.title.errors %}
+            <div class="form-error" style="color: var(--danger); font-size: 0.85rem;">{{ error }}</div>
+            {% endfor %}
+        </div>
+
+        <div class="form-group" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+            <div>
+                {{ form.category_id.label(style="font-weight: 600; display: block; margin-bottom: 0.5rem;") }}
+                {{ form.category_id(class="form-control") }}
+            </div>
+            <div>
+                {{ form.max_capacity.label(style="font-weight: 600; display: block; margin-bottom: 0.5rem;") }}
+                {{ form.max_capacity(class="form-control", placeholder="e.g., 50") }}
+                <small style="color: var(--text-light); font-size: 0.8rem;">{{ form.max_capacity.description }}</small>
+            </div>
+        </div>
+
+        <div class="form-group" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+            <div>
+                {{ form.date.label(style="font-weight: 600; display: block; margin-bottom: 0.5rem;") }}
+                {{ form.date(class="form-control", type="date") }}
+            </div>
+            <div>
+                {{ form.time.label(style="font-weight: 600; display: block; margin-bottom: 0.5rem;") }}
+                {{ form.time(class="form-control", type="time") }}
+            </div>
+        </div>
+
+        <div class="form-group">
+            {{ form.location.label(style="font-weight: 600; display: block; margin-bottom: 0.5rem;") }}
+            {{ form.location(class="form-control") }}
+        </div>
+
+        <div class="form-group">
+            {{ form.description.label(style="font-weight: 600; display: block; margin-bottom: 0.5rem;") }}
+            {{ form.description(class="form-control", rows="6") }}
+            {% for error in form.description.errors %}
+            <div class="form-error" style="color: var(--danger); font-size: 0.85rem;">{{ error }}</div>
+            {% endfor %}
+            <small style="color: var(--text-light); font-size: 0.8rem;">Include detailed information. Keywords will be
+                automatically extracted for the Recommendation Engine.</small>
+        </div>
+
+        <div style="margin-top: 2rem; display: flex; gap: 1rem;">
+            {{ form.submit(class="btn") }}
+            <a href="javascript:history.back()" class="btn" style="background-color: var(--text-light);">Cancel</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

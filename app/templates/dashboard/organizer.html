@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %}Organizer Dashboard{% endblock %}
+{% block content %}
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+    <h2>Organizer Dashboard</h2>
+    <a href="{{ url_for('events.create') }}" class="btn">+ Create New Event</a>
+</div>
+
+<div class="card" style="margin-bottom: 2rem;">
+    <h3 style="margin-bottom: 1rem; color: var(--primary-color);">My Events</h3>
+    {% if current_user.organized_events %}
+    <div style="overflow-x: auto;">
+        <table style="width: 100%; border-collapse: collapse; text-align: left;">
+            <thead>
+                <tr style="border-bottom: 2px solid #eee;">
+                    <th style="padding: 1rem;">Event Title</th>
+                    <th style="padding: 1rem;">Date</th>
+                    <th style="padding: 1rem;">Status</th>
+                    <th style="padding: 1rem;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for event in current_user.organized_events|sort(attribute='date', reverse=True) %}
+                <tr style="border-bottom: 1px solid #eee;">
+                    <td style="padding: 1rem; font-weight: 500;">
+                        <a href="{{ url_for('events.detail', event_id=event.id) }}"
+                            style="color: var(--secondary-color); text-decoration: none;">
+                            {{ event.title }}
+                        </a>
+                    </td>
+                    <td style="padding: 1rem; color: var(--text-light);">{{ event.date.strftime('%b %d, %Y') }}</td>
+                    <td style="padding: 1rem;">
+                        {% if event.is_active %}
+                        <span
+                            style="background-color: #d4edda; color: #155724; padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.8rem;">Active</span>
+                        {% else %}
+                        <span
+                            style="background-color: #f8d7da; color: #721c24; padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.8rem;">Archived</span>
+                        {% endif %}
+                    </td>
+                    <td style="padding: 1rem; display: flex; gap: 0.5rem;">
+                        <a href="{{ url_for('events.edit', event_id=event.id) }}" class="btn"
+                            style="padding: 0.4rem 0.8rem; font-size: 0.85rem; background-color: var(--warning); color: #333;">Edit</a>
+                        {% if event.is_active %}
+                        <form action="{{ url_for('events.delete', event_id=event.id) }}" method="POST"
+                            onsubmit="return confirm('Archive this event?');" style="display:inline;">
+                            <button type="submit" class="btn"
+                                style="padding: 0.4rem 0.8rem; font-size: 0.85rem; background-color: var(--danger);">Archive</button>
+                        </form>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <p style="color: var(--text-light); padding: 2rem 0; text-align: center;">You haven't created any events yet! Click
+        "Create New Event" to get started.</p>
+    {% endif %}
+</div>
+{% endblock %}

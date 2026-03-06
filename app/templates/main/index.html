@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block title %}Welcome to CERS{% endblock %}
+
+{% block content %}
+<div style="text-align: center; margin-top: 4rem;">
+    <h1 style="font-size: 3rem; color: var(--secondary-color); margin-bottom: 1rem;">Welcome to CERS</h1>
+    <p style="font-size: 1.25rem; color: var(--text-light); max-width: 600px; margin: 0 auto 2rem;">
+        The ultimate College Event Recommendation System built to connect students with awesome campus experiences.
+    </p>
+    <div>
+        <a href="{{ url_for('auth.register') }}" class="btn"
+            style="font-size: 1.25rem; padding: 1rem 2rem; margin-right: 1rem;">Get Started</a>
+        <a href="{{ url_for('auth.login') }}" class="btn"
+            style="background-color: var(--secondary-color); font-size: 1.25rem; padding: 1rem 2rem;">Log In</a>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% block title %}Event Catalog{% endblock %}
+
+{% block content %}
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+    <h2>Discover Events</h2>
+    {% if current_user.is_authenticated and current_user.role in ['organizer', 'admin'] %}
+    <a href="{{ url_for('events.create') }}" class="btn">+ Create New Event</a>
+    {% endif %}
+</div>
+
+<!-- Search & Filter Bar -->
+<div class="card" style="margin-bottom: 2rem; padding: 1rem 2rem;">
+    <form method="GET" action="{{ url_for('events.catalog') }}"
+        style="display: flex; gap: 1rem; align-items: flex-end;">
+        <div style="flex: 2;">
+            <label style="font-weight: 600; font-size: 0.85rem; display: block; margin-bottom: 0.25rem;">Search</label>
+            <input type="text" name="q" class="form-control" placeholder="Search events by keyword..."
+                value="{{ search_query or '' }}">
+        </div>
+        <div style="flex: 1;">
+            <label style="font-weight: 600; font-size: 0.85rem; display: block; margin-bottom: 0.25rem;">Category
+                Filter</label>
+            <select name="category_id" class="form-control">
+                <option value="">All Categories</option>
+                {% for category in categories %}
+                <option value="{{ category.id }}" {% if current_category==category.id %}selected{% endif %}>{{
+                    category.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div>
+            <button type="submit" class="btn" style="padding: 0.6rem 1.5rem;">Filter</button>
+            <a href="{{ url_for('events.catalog') }}" class="btn"
+                style="background-color: var(--text-light); padding: 0.6rem 1rem;">Clear</a>
+        </div>
+    </form>
+</div>
+
+<!-- Event Grid -->
+<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem;">
+    {% for event in events %}
+    <div class="card"
+        style="padding: 0; display: flex; flex-direction: column; overflow: hidden; transition: transform 0.2s;">
+        <!-- Category Banner -->
+        <div
+            style="background-color: var(--primary-color); color: white; padding: 0.5rem 1rem; font-size: 0.85rem; font-weight: 600; display: flex; justify-content: space-between;">
+            <span>{{ event.category.name }}</span>
+            <span>{{ event.date.strftime('%b %d, %Y') }}</span>
+        </div>
+
+        <div style="padding: 1.5rem; flex: 1; display: flex; flex-direction: column;">
+            <h3 style="margin-bottom: 0.5rem; color: var(--secondary-color);">{{ event.title }}</h3>
+            <div style="color: var(--text-light); font-size: 0.9rem; margin-bottom: 1rem;">
+                <p>📍 {{ event.location }}</p>
+                <p>⏰ {{ event.time.strftime('%I:%M %p') }}</p>
+                <p>👥 Organized by: {{ event.organizer.name }}</p>
+            </div>
+
+            <p
+                style="margin-bottom: 1.5rem; font-size: 0.95rem; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;">
+                {{ event.description }}
+            </p>
+
+            <div style="margin-top: auto;">
+                <a href="{{ url_for('events.detail', event_id=event.id) }}" class="btn"
+                    style="width: 100%; text-align: center; display: block;">View Details</a>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div
+        style="grid-column: 1 / -1; text-align: center; padding: 4rem; color: var(--text-light); background: white; border-radius: var(--border-radius);">
+        <h3 style="margin-bottom: 1rem;">No events found</h3>
+        <p>Try adjusting your search filters or check back later!</p>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}
