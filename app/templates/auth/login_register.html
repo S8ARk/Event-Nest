@@ -4,89 +4,240 @@
 
 {% block extra_css %}
 <style>
-    .auth-container {
-        max-width: 500px;
-        margin: 0 auto;
+    /* Animated Gradient Background for Auth Pages */
+    body {
+        background: linear-gradient(-45deg, #f5f7fa, #c3cfe2, #e0c3fc, #8ec5fc);
+        background-size: 400% 400%;
+        animation: gradientBG 15s ease infinite;
+    }
+    
+    @keyframes gradientBG {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
     }
 
-    .form-error {
+    .auth-container {
+        max-width: 500px;
+        margin: 4rem auto;
+    }
+
+    .card {
+        background-color: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        padding: 3rem;
+        border-radius: 1rem;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    }
+
+    /* Floating Labels Structure */
+    .form-group.floating {
+        position: relative;
+        margin-bottom: 1.5rem;
+    }
+
+    .form-group.floating .form-control {
+        border: 2px solid #ddd;
+        border-radius: 0.75rem; /* rounded-xl approx */
+        padding: 1.5rem 1rem 0.5rem; 
+        width: 100%;
+        background-color: transparent;
+        transition: border-color 0.2s;
+    }
+
+    .form-group.floating .form-control:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 4px rgba(74, 144, 226, 0.15); /* focus-ring */
+        outline: none;
+    }
+
+    .form-group.floating label {
+        position: absolute;
+        top: 50%;
+        left: 1rem;
+        transform: translateY(-50%);
+        font-size: 1rem;
+        color: var(--text-light);
+        pointer-events: none;
+        transition: all 0.2s ease;
+    }
+
+    .form-group.floating .form-control:focus + label,
+    .form-group.floating .form-control:not(:placeholder-shown) + label {
+        top: 0.75rem;
+        font-size: 0.75rem;
+        color: var(--primary-color);
+        font-weight: 600;
+    }
+
+    .form-error, .live-error {
+        color: var(--danger);
+        font-size: 0.85rem;
+        margin-top: 0.25rem;
+        display: none; /* JS will toggle */
+    }
+    
+    .server-error {
         color: var(--danger);
         font-size: 0.85rem;
         margin-top: 0.25rem;
     }
+
 </style>
 {% endblock %}
 
 {% block content %}
 <div class="auth-container">
     <div class="card">
-        <h2 style="margin-bottom: 1.5rem; text-align: center;">{{ title }}</h2>
+        <h2 style="margin-bottom: 2rem; text-align: center; color: var(--secondary-color); font-size: 2rem;">{{ title }}</h2>
 
-        <form method="POST" action="">
+        <form id="authForm" method="POST" action="" novalidate>
             {{ form.hidden_tag() }}
 
             {% if mode == 'register' %}
-            <div class="form-group">
+            <div class="form-group floating">
+                {{ form.name(class="form-control", placeholder=" ") }}
                 {{ form.name.label }}
-                {{ form.name(class="form-control") }}
+                <div class="live-error" id="err-name"></div>
                 {% for error in form.name.errors %}
-                <div class="form-error">{{ error }}</div>
+                <div class="server-error">{{ error }}</div>
                 {% endfor %}
             </div>
             {% endif %}
 
-            <div class="form-group">
+            <div class="form-group floating">
+                {{ form.email(class="form-control", placeholder=" ") }}
                 {{ form.email.label }}
-                {{ form.email(class="form-control") }}
+                <div class="live-error" id="err-email"></div>
                 {% for error in form.email.errors %}
-                <div class="form-error">{{ error }}</div>
+                <div class="server-error">{{ error }}</div>
                 {% endfor %}
             </div>
 
-            <div class="form-group">
+            <div class="form-group floating">
+                {{ form.password(class="form-control", placeholder=" ") }}
                 {{ form.password.label }}
-                {{ form.password(class="form-control") }}
+                <div class="live-error" id="err-password"></div>
                 {% for error in form.password.errors %}
-                <div class="form-error">{{ error }}</div>
+                <div class="server-error">{{ error }}</div>
                 {% endfor %}
             </div>
 
             {% if mode == 'register' %}
-            <div class="form-group">
+            <div class="form-group floating">
+                {{ form.confirm_password(class="form-control", placeholder=" ") }}
                 {{ form.confirm_password.label }}
-                {{ form.confirm_password(class="form-control") }}
+                <div class="live-error" id="err-confirm_password"></div>
                 {% for error in form.confirm_password.errors %}
-                <div class="form-error">{{ error }}</div>
+                <div class="server-error">{{ error }}</div>
                 {% endfor %}
             </div>
 
-            <div class="form-group">
-                {{ form.role.label }}
-                {{ form.role(class="form-control") }}
+            <div class="form-group" style="margin-bottom: 1.5rem;">
+                <label style="display: block; margin-bottom: 0.5rem; color: var(--text-light); font-weight: 600; font-size: 0.85rem;">{{ form.role.label }}</label>
+                {{ form.role(class="form-control", style="border-radius: 0.75rem; border: 2px solid #ddd; padding: 0.75rem 1rem;") }}
             </div>
             {% endif %}
 
             {% if mode == 'login' %}
-            <div class="form-group" style="display: flex; align-items: center; gap: 0.5rem;">
-                {{ form.remember() }}
-                {{ form.remember.label }}
+            <div class="form-group" style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1.5rem;">
+                {{ form.remember(style="width: 1.25rem; height: 1.25rem; accent-color: var(--primary-color);") }}
+                <label style="color: var(--text-light); cursor: pointer;" for="remember">{{ form.remember.label.text }}</label>
             </div>
             {% endif %}
 
-            <div style="margin-top: 1.5rem;">
-                {{ form.submit(class="btn", style="width: 100%;") }}
+            <div style="margin-top: 2rem;">
+                {{ form.submit(class="btn", style="width: 100%; border-radius: 0.75rem; font-size: 1.1rem; padding: 1rem;") }}
             </div>
         </form>
 
-        <div style="text-align: center; margin-top: 1.5rem; font-size: 0.9rem;">
+        <div style="text-align: center; margin-top: 2rem; font-size: 0.95rem;">
             {% if mode == 'login' %}
-            <p>Don't have an account? <a href="{{ url_for('auth.register') }}" style="color: var(--primary-color);">Sign
-                    Up</a></p>
+            <p>Don't have an account? <a href="{{ url_for('auth.register') }}" style="color: var(--primary-color); font-weight: 600; text-decoration: none;">Sign Up</a></p>
             {% else %}
-            <p>Already have an account? <a href="{{ url_for('auth.login') }}" style="color: var(--primary-color);">Log
-                    In</a></p>
+            <p>Already have an account? <a href="{{ url_for('auth.login') }}" style="color: var(--primary-color); font-weight: 600; text-decoration: none;">Log In</a></p>
             {% endif %}
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const form = document.getElementById("authForm");
+        const inputs = form.querySelectorAll(".form-control[type='text'], .form-control[type='email'], .form-control[type='password']");
+
+        const validators = {
+            email: (val) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val) ? "" : "Invalid email format.",
+            password: (val) => val.length >= 6 ? "" : "Must be at least 6 characters.",
+            confirm_password: (val) => {
+                const pwd = document.querySelector('input[name="password"]').value;
+                return val === pwd ? "" : "Passwords do not match.";
+            },
+            name: (val) => val.length >= 2 ? "" : "Must be at least 2 characters."
+        };
+
+        function validateInput(input) {
+            const name = input.name;
+            const errDiv = document.getElementById("err-" + name);
+            if (!errDiv) return true;
+
+            const errMsg = validators[name] ? validators[name](input.value) : "";
+            
+            if (input.value === "") {
+                // Ignore empty unless submitting
+                input.style.borderColor = "#ddd";
+                errDiv.style.display = "none";
+                return false;
+            }
+
+            if (errMsg) {
+                input.style.borderColor = "var(--danger)";
+                errDiv.innerText = errMsg;
+                errDiv.style.display = "block";
+                return false;
+            } else {
+                input.style.borderColor = "var(--success)";
+                errDiv.style.display = "none";
+                return true;
+            }
+        }
+
+        inputs.forEach(input => {
+            input.addEventListener("input", () => validateInput(input));
+            // Trigger check on load for autofilled 
+            if(input.value) validateInput(input);
+        });
+
+        form.addEventListener("submit", function(e) {
+            let isFormValid = true;
+            inputs.forEach(input => {
+                const isValid = validateInput(input);
+                if (!isValid && input.value === "") {
+                    // Force error visuals on empty required fields
+                    input.style.borderColor = "var(--danger)";
+                    const errDiv = document.getElementById("err-" + input.name);
+                    if (errDiv) {
+                        errDiv.innerText = "This field is required.";
+                        errDiv.style.display = "block";
+                    }
+                    isFormValid = false;
+                } else if (!isValid) {
+                    isFormValid = false;
+                }
+            });
+
+            if (!isFormValid) {
+                e.preventDefault(); // Prevent submission (React Hook Form style logic)
+                
+                // Fire custom toast (if it exists globally, otherwise fallback)
+                if (typeof showToast === 'function') {
+                    showToast("Please fix the validation errors before submitting.", "error");
+                }
+            }
+        });
+    });
+</script>
 {% endblock %}
