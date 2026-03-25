@@ -22,6 +22,7 @@ test_final.txt
 test_final_out.txt
 test_out.txt
 test_out_final.txt
+pytest_out.txt
 
 # OS generated files
 .DS_Store
