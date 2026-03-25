@@ -39,14 +39,93 @@
             min-height: 100vh;
         }
 
+        /* Toast Container */
+        #toast-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .toast {
+            min-width: 250px;
+            padding: 1rem 1.5rem;
+            border-radius: var(--border-radius);
+            color: white;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.3s, transform 0.3s;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 500;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .toast-success {
+            background-color: var(--success);
+        }
+
+        .toast-danger {
+            background-color: var(--danger);
+        }
+
+        .toast-info {
+            background-color: var(--info);
+        }
+
+        .toast-warning {
+            background-color: var(--warning);
+        }
+
+        /* Dark Mode Variables */
+        body.dark-mode {
+            --primary-color: #64b5f6;
+            --primary-hover: #42a5f5;
+            --secondary-color: #e0e0e0;
+            --background-color: #121212;
+            --surface-color: #1e1e1e;
+            --text-main: #f5f5f5;
+            --text-light: #aaaaaa;
+            --border-radius: 8px;
+            --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.4);
+        }
+
+        body.dark-mode .navbar.scrolled {
+            background-color: rgba(30, 30, 30, 0.85);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
         /* Navigation */
         .navbar {
             background-color: var(--surface-color);
             padding: 1rem 2rem;
-            box-shadow: var(--box-shadow);
+            box-shadow: none;
+            /* Removed initial shadow for cleaner look */
             display: flex;
             justify-content: space-between;
             align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+
+        .navbar.scrolled {
+            background-color: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 0.8rem 2rem;
         }
 
         .navbar-brand {
@@ -171,6 +250,9 @@
     <nav class="navbar">
         <a href="{{ url_for('main.index') }}" class="navbar-brand">🎓 CERS</a>
         <div class="nav-links">
+            <button id="themeToggle"
+                style="background:none; border:none; cursor:pointer; font-size:1.2rem; margin-right: 1rem;"
+                title="Toggle Dark/Light Mode">🌙</button>
             {% if current_user.is_authenticated %}
             <a href="{{ url_for('events.catalog') }}">Discover Events</a>
             <a href="{{ url_for('user.dashboard') }}">Dashboard</a>
@@ -185,13 +267,19 @@
     </nav>
 
     <main class="container">
+        <!-- Toast Container -->
+        <div id="toast-container"></div>
+
+        <!-- Inject Flask flashes as Toasts on load -->
         {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
-        {% for category, message in messages %}
-        <div class="alert alert-{{ category }}">
-            {{ message }}
-        </div>
-        {% endfor %}
+        <script>
+            document.addEventListener('DOMContentLoaded', () => {
+                {% for category, message in messages %}
+                showToast("{{ message }}", "{{ category }}");
+                {% endfor %}
+            });
+        </script>
         {% endif %}
         {% endwith %}
 
@@ -203,6 +291,65 @@
     </footer>
 
     {% block extra_js %}{% endblock %}
+    <script>
+        // Theme Switcher Logic
+        const themeToggle = document.getElementById('themeToggle');
+        const currentTheme = localStorage.getItem('theme') || 'light';
+
+        if (currentTheme === 'dark') {
+            document.body.classList.add('dark-mode');
+            themeToggle.textContent = '☀️';
+        }
+
+        themeToggle.addEventListener('click', () => {
+            document.body.classList.toggle('dark-mode');
+            let theme = 'light';
+            if (document.body.classList.contains('dark-mode')) {
+                theme = 'dark';
+                themeToggle.textContent = '☀️';
+            } else {
+                themeToggle.textContent = '🌙';
+            }
+            localStorage.setItem('theme', theme);
+        });
+
+        // Global Toast Notification System
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+
+            // Handle flask categories mapped to toast CSS classes
+            if (type === 'error') type = 'danger';
+            if (type === 'message') type = 'info';
+
+            toast.className = `toast toast-${type}`;
+            toast.innerHTML = `
+                <span>${message}</span>
+                <span style="cursor:pointer; margin-left: 1rem; font-weight:bold;" onclick="this.parentElement.remove()">&times;</span>
+            `;
+
+            container.appendChild(toast);
+
+            // Trigger animation
+            setTimeout(() => toast.classList.add('show'), 10);
+
+            // Auto remove
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 300);
+            }, 4000);
+        }
+
+        // Navbar glass-morphism scroll effect
+        window.addEventListener('scroll', function () {
+            const nav = document.querySelector('.navbar');
+            if (window.scrollY > 50) {
+                nav.classList.add('scrolled');
+            } else {
+                nav.classList.remove('scrolled');
+            }
+        });
+    </script>
 </body>
 
 </html>
