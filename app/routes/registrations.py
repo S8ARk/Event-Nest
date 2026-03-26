@@ -1,5 +1,6 @@
 from flask import Blueprint, redirect, url_for, flash, request
 from flask_login import login_required, current_user
+from app.utils.decorators import requires_onboarding
 from app import db
 from app.models.event import Event
 from app.models.interaction import Registration, InteractionLog
@@ -9,6 +10,7 @@ bp = Blueprint('registrations', __name__, url_prefix='/register')
 
 @bp.route('/<int:event_id>', methods=['POST'])
 @login_required
+@requires_onboarding
 @student_required
 def rsvp(event_id):
     event = Event.query.get_or_404(event_id)
@@ -56,6 +58,7 @@ def rsvp(event_id):
 
 @bp.route('/<int:event_id>/cancel', methods=['POST'])
 @login_required
+@requires_onboarding
 @student_required
 def cancel(event_id):
     event = Event.query.get_or_404(event_id)

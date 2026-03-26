@@ -26,11 +26,12 @@ def admin_required(f):
     return role_required('admin')(f)
 
 def requires_onboarding(f):
-    """Decorator to ensure authenticated users complete onboarding."""
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        if current_user.is_authenticated and not current_user.has_completed_onboarding:
-            flash("Please explicitly select your event interests to begin receiving AI recommendations.", "warning")
+        if not current_user.is_authenticated:
+            return redirect(url_for('auth.login'))
+        if not current_user.has_completed_onboarding:
+            flash('Please select your interests to complete your profile!', 'warning')
             return redirect(url_for('auth.onboarding'))
         return f(*args, **kwargs)
     return decorated_function

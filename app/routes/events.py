@@ -1,14 +1,14 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, request, abort
 from flask_login import login_required, current_user
+from app.utils.decorators import requires_onboarding
 from app import db
 from app.models.event import Event, Category
 from app.forms.event import EventForm
-from app.utils.decorators import organizer_required, requires_onboarding
+from app.utils.decorators import organizer_required
 
 bp = Blueprint('events', __name__, url_prefix='/events')
 
 @bp.route('/')
-@requires_onboarding
 def catalog():
     # Filtering and standard catalog browsing (for all users including anon)
     category_id = request.args.get('category_id', type=int)
@@ -28,7 +28,6 @@ def catalog():
     return render_template('events/catalog.html', events=events, categories=categories, current_category=category_id, search_query=search_query)
 
 @bp.route('/<int:event_id>')
-@requires_onboarding
 def detail(event_id):
     event = Event.query.get_or_404(event_id)
     if not event.is_active:
@@ -37,6 +36,7 @@ def detail(event_id):
 
 @bp.route('/new', methods=['GET', 'POST'])
 @login_required
+@requires_onboarding
 @organizer_required
 def create():
     form = EventForm()
@@ -68,6 +68,7 @@ def create():
 
 @bp.route('/<int:event_id>/edit', methods=['GET', 'POST'])
 @login_required
+@requires_onboarding
 @organizer_required
 def edit(event_id):
     event = Event.query.get_or_404(event_id)
@@ -100,6 +101,7 @@ def edit(event_id):
 
 @bp.route('/<int:event_id>/delete', methods=['POST'])
 @login_required
+@requires_onboarding
 @organizer_required
 def delete(event_id):
     event = Event.query.get_or_404(event_id)

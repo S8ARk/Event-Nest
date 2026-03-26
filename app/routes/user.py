@@ -1,5 +1,6 @@
 from flask import Blueprint, render_template, request, flash, redirect, url_for
 from flask_login import login_required, current_user
+from app.utils.decorators import requires_onboarding
 from app.utils.decorators import role_required
 from app import db
 from app.models.user import Interest, UserInterest
@@ -8,6 +9,7 @@ bp = Blueprint('user', __name__, url_prefix='/user')
 
 @bp.route('/dashboard')
 @login_required
+@requires_onboarding
 def dashboard():
     if current_user.role == 'student':
         from app.services.recommender import get_cached_recommendations
@@ -26,6 +28,7 @@ def dashboard():
 
 @bp.route('/profile', methods=['GET', 'POST'])
 @login_required
+@requires_onboarding
 @role_required('student', 'organizer', 'admin')
 def profile():
     if request.method == 'POST':

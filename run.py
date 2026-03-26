@@ -12,7 +12,12 @@ def seed_data():
             db.session.add(Category(name=c))
             
     if not Interest.query.first():
-        interests = ['Computer Science', 'Basketball', 'Music', 'Networking', 'Literature', 'Coding', 'Artificial Intelligence']
+        interests = [
+            'Computer Science', 'Basketball', 'Music', 'Networking', 'Literature', 
+            'Coding', 'Artificial Intelligence', 'Robotics', 'Graphic Design', 
+            'Finance', 'Entrepreneurship', 'Photography', 'Volunteering', 
+            'Theater Arts', 'Data Science', 'Startups', 'Film Production'
+        ]
         for i in interests:
             db.session.add(Interest(name=i))
             
@@ -23,7 +28,8 @@ def seed_data():
             name='System Admin', 
             email='admin@cers.edu', 
             password_hash=bcrypt.generate_password_hash('admin123').decode('utf-8'),
-            role='admin'
+            role='admin',
+            has_completed_onboarding=True
         )
         db.session.add(admin)
 

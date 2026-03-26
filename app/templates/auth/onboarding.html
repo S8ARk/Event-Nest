@@ -1,49 +1,96 @@
 {% extends "base.html" %}
 
-{% block title %}Complete Your Profile{% endblock %}
-
-{% block content %}
-<div class="card" style="max-width: 800px; margin: 2rem auto; padding: 3rem;">
-    <h2 style="text-align: center; margin-bottom: 1rem; color: var(--secondary-color);">Select Your Interests</h2>
-    <p style="text-align: center; color: var(--text-light); margin-bottom: 2rem;">
-        Choose topics you're intuitively drawn to so our AI engine can recommend the perfect college events for you.
-    </p>
-
-    <form method="POST" action="{{ url_for('auth.onboarding') }}">
-        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
-            {% for interest in interests %}
-            <label class="interest-card" style="cursor: pointer; position: relative;">
-                <input type="checkbox" name="interests" value="{{ interest.id }}" class="hidden-checkbox">
-                <div class="card-content" style="padding: 1rem; text-align: center; border: 2px solid #ddd; border-radius: 12px; transition: all 0.2s;">
-                    {{ interest.name }}
-                </div>
-            </label>
-            {% endfor %}
-        </div>
-        
-        <div style="text-align: center;">
-            <button type="submit" class="btn" style="padding: 0.75rem 3rem; font-size: 1.1rem; border-radius: 2rem;">Save Interests & Begin</button>
-        </div>
-    </form>
-</div>
-{% endblock %}
+{% block title %}{{ title }}{% endblock %}
 
 {% block extra_css %}
 <style>
-.hidden-checkbox {
-    position: absolute;
-    opacity: 0;
-    cursor: pointer;
-    height: 0;
-    width: 0;
-}
+    body {
+        background: linear-gradient(-45deg, #f5f7fa, #c3cfe2, #e0c3fc, #8ec5fc);
+        background-size: 400% 400%;
+        animation: gradientBG 15s ease infinite;
+    }
+    
+    @keyframes gradientBG {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
 
-.interest-card .hidden-checkbox:checked ~ .card-content {
-    border-color: var(--primary-color);
-    background-color: rgba(74, 144, 226, 0.1);
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-    color: var(--primary-color);
-    font-weight: 600;
-}
+    .auth-container { max-width: 700px; margin: 4rem auto; }
+    .card {
+        background-color: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        padding: 3rem; border-radius: 1rem;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    }
+    .interest-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+    .interest-card {
+        border: 2px solid #ddd;
+        border-radius: 0.75rem;
+        padding: 1.25rem 1rem;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        user-select: none;
+        color: var(--text-main);
+        background-color: transparent;
+        font-weight: 500;
+    }
+    .interest-card:hover {
+        border-color: #bbb;
+        transform: translateY(-2px);
+    }
+    .interest-card.selected {
+        border-color: var(--primary-color);
+        background-color: rgba(74, 144, 226, 0.1);
+        color: var(--primary-color);
+        font-weight: 600;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(74, 144, 226, 0.15);
+    }
+    .hidden-checkbox { display: none; }
 </style>
+{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="card">
+        <h2 style="margin-bottom: 0.5rem; text-align: center; color: var(--secondary-color); font-size: 2rem;">What are you interested in?</h2>
+        <p style="text-align: center; color: var(--text-light); margin-bottom: 2.5rem; font-size: 1.1rem;">Select the topics you care about, and our AI will personalize your event recommendations!</p>
+
+        <form method="POST" action="">
+            <div class="interest-grid">
+                {% for interest in interests %}
+                <label class="interest-card" id="card-{{ interest.id }}">
+                    <input type="checkbox" name="interests" value="{{ interest.id }}" class="hidden-checkbox" onchange="toggleCard(this, 'card-{{ interest.id }}')">
+                    {{ interest.name }}
+                </label>
+                {% endfor %}
+            </div>
+
+            <div style="margin-top: 2rem;">
+                <button type="submit" class="btn" style="width: 100%; border-radius: 0.75rem; font-size: 1.1rem; padding: 1rem;">Complete Profile & Enter CERS</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function toggleCard(checkbox, cardId) {
+        const card = document.getElementById(cardId);
+        if (checkbox.checked) {
+            card.classList.add('selected');
+        } else {
+            card.classList.remove('selected');
+        }
+    }
+</script>
 {% endblock %}
