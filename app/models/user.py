@@ -17,6 +17,7 @@ class User(db.Model, UserMixin):
     created_at = db.Column(db.DateTime, nullable=False, default=lambda: datetime.now(timezone.utc))
     updated_at = db.Column(db.DateTime, nullable=False, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
     is_active = db.Column(db.Boolean, nullable=False, default=True)
+    has_completed_onboarding = db.Column(db.Boolean, nullable=False, default=False)
     
     # Relationships
     user_interests = db.relationship('UserInterest', backref='user', lazy=True, cascade="all, delete-orphan")
