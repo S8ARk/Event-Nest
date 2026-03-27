@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, request
 from flask_login import login_user, current_user, logout_user, login_required
 from app import db, bcrypt
-from app.models.user import User
+from app.models.user import User, Interest, UserInterest
 from app.forms.auth import RegistrationForm, LoginForm
 
 bp = Blueprint('auth', __name__, url_prefix='/auth')
@@ -50,3 +50,32 @@ def logout():
     logout_user()
     flash('You have been logged out.', 'info')
     return redirect(url_for('main.index'))
+
+@bp.route('/onboarding', methods=['GET', 'POST'])
+@login_required
+def onboarding():
+    """Onboarding workflow to force users to capture their event interests."""
+    if current_user.has_completed_onboarding:
+        return redirect(url_for('main.index'))
+        
+    if request.method == 'POST':
+        selected_ids = request.form.getlist('interests')
+        if not selected_ids:
+            flash('Please select at least one interest to proceed.', 'warning')
+            return redirect(url_for('auth.onboarding'))
+            
+        # Clear existing interests if they somehow exist
+        UserInterest.query.filter_by(user_id=current_user.id).delete()
+        
+        for interest_id in selected_ids:
+            user_interest = UserInterest(user_id=current_user.id, interest_id=int(interest_id))
+            db.session.add(user_interest)
+            
+        current_user.has_completed_onboarding = True
+        db.session.commit()
+        
+        flash('Onboarding complete! We have initialized your Recommendation Engine.', 'success')
+        return redirect(url_for('events.catalog'))
+        
+    interests = Interest.query.all()
+    return render_template('auth/onboarding.html', interests=interests)

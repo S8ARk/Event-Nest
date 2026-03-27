@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block title %}Complete Your Profile{% endblock %}
+
+{% block content %}
+<div class="card" style="max-width: 800px; margin: 2rem auto; padding: 3rem;">
+    <h2 style="text-align: center; margin-bottom: 1rem; color: var(--secondary-color);">Select Your Interests</h2>
+    <p style="text-align: center; color: var(--text-light); margin-bottom: 2rem;">
+        Choose topics you're intuitively drawn to so our AI engine can recommend the perfect college events for you.
+    </p>
+
+    <form method="POST" action="{{ url_for('auth.onboarding') }}">
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
+            {% for interest in interests %}
+            <label class="interest-card" style="cursor: pointer; position: relative;">
+                <input type="checkbox" name="interests" value="{{ interest.id }}" class="hidden-checkbox">
+                <div class="card-content" style="padding: 1rem; text-align: center; border: 2px solid #ddd; border-radius: 12px; transition: all 0.2s;">
+                    {{ interest.name }}
+                </div>
+            </label>
+            {% endfor %}
+        </div>
+        
+        <div style="text-align: center;">
+            <button type="submit" class="btn" style="padding: 0.75rem 3rem; font-size: 1.1rem; border-radius: 2rem;">Save Interests & Begin</button>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.hidden-checkbox {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    height: 0;
+    width: 0;
+}
+
+.interest-card .hidden-checkbox:checked ~ .card-content {
+    border-color: var(--primary-color);
+    background-color: rgba(74, 144, 226, 0.1);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    color: var(--primary-color);
+    font-weight: 600;
+}
+</style>
+{% endblock %}
