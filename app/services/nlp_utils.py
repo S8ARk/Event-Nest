@@ -2,56 +2,56 @@ import string
 import nltk
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
+from nltk.stem import WordNetLemmatizer
 from collections import Counter
 
-# We assume punkt and stopwords have been downloaded per the outliers in Module 1.
-# nltk.download('punkt')
-# nltk.download('stopwords')
+lemmatizer = WordNetLemmatizer()
 
 def extract_keywords(text: str, top_n: int = 15) -> str:
     """
-    Takes raw event description text, tokenizes it, removes stopwords 
-    and punctuation, and returns the top_n keywords as a comma-separated string.
+    Takes raw event description text, tokenizes it, performs POS tagging
+    to extract only Nouns and Adjectives, Lemmatizes them to root form,
+    removes stopwords, and returns the top_n keywords.
     """
     if not text:
         return ""
         
-    # Convert to lowercase
-    text = text.lower()
-    
     try:
-        # Tokenize using NLTK
         tokens = word_tokenize(text)
-    except LookupError:
-        # Fallback if punkt isn't properly installed
+    except LookupError: # Fallback
         tokens = text.split()
         
-    # Remove punctuation and stopwords
+    # Part of Speech Tagging (Requires original casing for best accuracy)
+    try:
+        pos_tags = nltk.pos_tag(tokens)
+    except LookupError:
+        pos_tags = [(t, 'NN') for t in tokens]
+        
     stop_words = set(stopwords.words('english'))
-    punctuation = set(string.punctuation)
+    filtered_lemmas = []
     
-    # Filter out short words, stopwords, and punctuation
-    filtered_tokens = [
-        word for word in tokens 
-        if word not in stop_words 
-        and word not in punctuation
-        and len(word) > 2
-        and word.isalpha()
-    ]
+    # NN = Noun, singular | NNS = Noun, plural | NNP = Proper noun | JJ = Adjective
+    allowed_tags = ['NN', 'NNS', 'NNP', 'NNPS', 'JJ', 'JJR', 'JJS']
     
+    for word, tag in pos_tags:
+        word_lower = word.lower().strip(string.punctuation)
+        if tag in allowed_tags and word_lower and word_lower not in stop_words and len(word_lower) > 2 and word_lower.isalpha():
+            # Lemmatize the lowercase word
+            lemma = lemmatizer.lemmatize(word_lower)
+            filtered_lemmas.append(lemma)
+            
     # Count frequencies
-    word_counts = Counter(filtered_tokens)
+    word_counts = Counter(filtered_lemmas)
     
-    # Get top_n most common words
+    # Get top_n most common semantic words
     top_words = [word for word, count in word_counts.most_common(top_n)]
     
-    # Return as comma separated string for DB storage
     return ",".join(top_words)
 
 def tokenize_interests(interests_list: list) -> list:
     """
-    Takes a list of interest names (e.g. ['Artificial Intelligence', 'Sports'])
-    and breaks them down into individual searchable NLTK token keywords.
+    Takes a list of interest names and breaks them down into individual 
+    lemmatized tokens.
     """
     all_tokens = []
     for interest in interests_list:
@@ -60,7 +60,9 @@ def tokenize_interests(interests_list: list) -> list:
         except LookupError:
             tokens = interest.lower().split()
             
-        filtered = [w for w in tokens if w.isalpha() and len(w) > 2]
-        all_tokens.extend(filtered)
-        
-    return list(set(all_tokens)) # Return unique tokens
+        for w in tokens:
+            w_clean = w.lower().strip(string.punctuation)
+            if w_clean and w_clean.isalpha() and len(w_clean) > 2:
+                all_tokens.append(lemmatizer.lemmatize(w_clean))
+    
+    return list(set(all_tokens))
