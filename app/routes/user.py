@@ -10,8 +10,13 @@ bp = Blueprint('user', __name__, url_prefix='/user')
 @login_required
 def dashboard():
     if current_user.role == 'student':
-        from app.services.recommender import get_cached_recommendations
-        # Load pre-computed recommendations from cache
+        from app.services.recommender import generate_recommendations_for_user, get_cached_recommendations
+        
+        # Proactively re-calculate recommendations to capture newly created events
+        # or fresh onboarding interests instantly
+        generate_recommendations_for_user(current_user.id)
+        
+        # Load the freshly computed recommendations
         recommendations = get_cached_recommendations(current_user.id)
         return render_template('dashboard/student.html', recommendations=recommendations)
     elif current_user.role == 'organizer':
