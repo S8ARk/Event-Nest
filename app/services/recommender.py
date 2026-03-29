@@ -2,10 +2,9 @@ from app.models.user import User, Interest, UserInterest
 from app.models.event import Event
 from app.models.interaction import Recommendation
 from app.services.nlp_utils import tokenize_interests
+from flask import current_app
 from collections import Counter
 from app import db
-
-MIN_SCORE_THRESHOLD = 15.0  # Percentage
 
 def calculate_similarity(user_weighted_tokens: dict, event_keywords_list: list) -> float:
     """
@@ -95,7 +94,8 @@ def generate_recommendations_for_user(user_id: int):
             score += 15.0
             score = min(score, 100.0)
             
-        if score >= MIN_SCORE_THRESHOLD:
+        min_threshold = current_app.config.get('MIN_SCORE_THRESHOLD', 15.0)
+        if score >= min_threshold:
             # Reconstruct the matched context
             matched_terms = [t for t in event_keywords_list if t in user_weighted_tokens]
             top_matches = list(set(matched_terms))[:3]
