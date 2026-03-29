@@ -55,3 +55,35 @@ window.addEventListener('scroll', function () {
         nav.classList.remove('scrolled');
     }
 });
+
+// Prevent Double Click Submission Bugs
+document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('form').forEach(form => {
+        form.addEventListener('submit', function(e) {
+            // Find all submit buttons within this form
+            const submitBtns = this.querySelectorAll('button[type="submit"], input[type="submit"]');
+            
+            // If already processing, stop further events
+            if (this.dataset.submitting === "true") {
+                e.preventDefault();
+                return;
+            }
+            
+            // Mark as submitting
+            this.dataset.submitting = "true";
+            
+            // Disable buttons and show processing state
+            submitBtns.forEach(btn => {
+                btn.dataset.originalText = btn.value || btn.innerHTML;
+                btn.disabled = true;
+                if (btn.tagName.toLowerCase() === 'input') {
+                    btn.value = "Processing...";
+                } else {
+                    btn.innerHTML = "Processing...";
+                }
+                btn.style.opacity = '0.7';
+                btn.style.cursor = 'not-allowed';
+            });
+        });
+    });
+});

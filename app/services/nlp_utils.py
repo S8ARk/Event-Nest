@@ -6,6 +6,7 @@ from nltk.stem import WordNetLemmatizer
 from collections import Counter
 
 lemmatizer = WordNetLemmatizer()
+ENGLISH_STOP_WORDS = set(stopwords.words('english'))
 
 def extract_keywords(text: str, top_n: int = 15) -> str:
     """
@@ -27,7 +28,6 @@ def extract_keywords(text: str, top_n: int = 15) -> str:
     except LookupError:
         pos_tags = [(t, 'NN') for t in tokens]
         
-    stop_words = set(stopwords.words('english'))
     filtered_lemmas = []
     
     # NN = Noun, singular | NNS = Noun, plural | NNP = Proper noun | JJ = Adjective
@@ -35,7 +35,7 @@ def extract_keywords(text: str, top_n: int = 15) -> str:
     
     for word, tag in pos_tags:
         word_lower = word.lower().strip(string.punctuation)
-        if tag in allowed_tags and word_lower and word_lower not in stop_words and len(word_lower) > 2 and word_lower.isalpha():
+        if tag in allowed_tags and word_lower and word_lower not in ENGLISH_STOP_WORDS and len(word_lower) > 2 and word_lower.isalpha():
             # Lemmatize the lowercase word
             lemma = lemmatizer.lemmatize(word_lower)
             filtered_lemmas.append(lemma)

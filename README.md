@@ -1,9 +1,9 @@
-# College Event Recommendation System (CERS)
+# College Event Recommendation System (V2)
 
-Welcome to CERS! This guide will help you launch the application from scratch on your local machine.
+Welcome to CERS V2! This radically modernized application acts as an intelligent event discovery engine leveraging Python, Flask, an NLTK Artificial Intelligence algorithm, modern MVC Service Architectures, and Glassmorphism UI styling rules.
 
 ## Prerequisites
-Make sure you have **Python 3.8+** installed on your system. 
+Make sure you have **Python 3.8+** installed on your system. Due to the new DevOps security upgrades, you will also need to generate a local configuration matrix.
 
 ## 0 to 1: Startup Guide
 
@@ -34,14 +34,16 @@ Install all required libraries, including Flask, SQLAlchemy, and NLTK.
 pip install -r requirements.txt
 ```
 
-### Step 4: Setup Environment Variables
-Create a file named `.env` in the root folder of the project if it doesn't exist, and add a secret key:
+### Step 4: Setup Environment Variables (VITAL for V2 Security)
+Create a file strictly named `.env` in the root folder of the project. You must supply a cryptographically generated string to satisfy the DevOps safety mechanisms:
 ```env
 SECRET_KEY=your_super_secret_key_here
+# Optional Constants:
+MIN_SCORE_THRESHOLD=15.0
 ```
 
 ### Step 5: Run the Application
-Start the Flask development server. This command will automatically create the local SQLite database (`instance/cers.db`) and seed it with starter data (Categories, Interests, and an Admin user).
+Start the Flask development server. This command will autonomously trigger the NLTK Corpus generator to download the NLP library cores, build the local SQLite database (`instance/cers.db`), and seed it with starter data (Categories, Interests, and an Admin user).
 ```bash
 python run.py
 ```

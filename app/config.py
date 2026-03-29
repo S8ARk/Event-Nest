@@ -11,7 +11,7 @@ class Config:
         raise ValueError("CRITICAL: No SECRET_KEY set for Flask application. You must define this in your .env configuration.")
         
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \
-        'sqlite:///' + os.path.join(basedir, 'instance', 'cers.db')
+        'sqlite:///' + os.path.join(basedir, 'instance', 'cers.db') + '?timeout=15'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     
     # NLP Engine Constants

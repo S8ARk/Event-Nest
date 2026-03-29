@@ -16,13 +16,8 @@ instance/
 .pytest_cache/
 .coverage
 
-# Specific local test output files to ignore
-fix_test.txt
-test_final.txt
-test_final_out.txt
-test_out.txt
-test_out_final.txt
-pytest_out.txt
+# Scratch scripts, old logs, and one-off test files
+NNN/
 
 # OS generated files
 .DS_Store
