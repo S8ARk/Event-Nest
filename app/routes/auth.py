@@ -8,6 +8,9 @@ bp = Blueprint('auth', __name__, url_prefix='/auth')
 
 @bp.route('/register', methods=['GET', 'POST'])
 def register():
+    """
+    Processes new user registrations, gracefully hashing passwords and verifying uniqueness constraints.
+    """
     if current_user.is_authenticated:
         return redirect(url_for('main.index'))
     
@@ -29,6 +32,9 @@ def register():
 
 @bp.route('/login', methods=['GET', 'POST'])
 def login():
+    """
+    Authenticates existing users via bcrypt hash comparisons and establishes an encrypted session.
+    """
     if current_user.is_authenticated:
         return redirect(url_for('main.index'))
         
@@ -47,6 +53,9 @@ def login():
 
 @bp.route('/logout')
 def logout():
+    """
+    Terminates the active user session and redirects to the landing page.
+    """
     logout_user()
     flash('You have been logged out.', 'info')
     return redirect(url_for('main.index'))
