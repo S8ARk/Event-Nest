@@ -39,4 +39,5 @@ if __name__ == '__main__':
         
         seed_data()
             
-    app.run(debug=True, use_reloader=False)
+    debug_mode = os.environ.get('FLASK_DEBUG', 'False').lower() in ['true', '1', 't']
+    app.run(debug=debug_mode, use_reloader=False)

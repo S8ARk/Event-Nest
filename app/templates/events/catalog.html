@@ -46,15 +46,15 @@
     const eventsData = [
         {% for event in events %}
     {
-        id: { { event.id } },
-        title: { { event.title | tojson } },
-        description: { { event.description | tojson } },
-        category: { { event.category.name | tojson } },
+        id: {{ event.id }},
+        title: {{ event.title | tojson }},
+        description: {{ event.description | tojson }},
+        category: {{ event.category.name | tojson }},
         categoryId: "{{ event.category_id }}",
-            date: { { event.date.strftime('%b %d, %Y') | tojson } },
-        time: { { event.time.strftime('%I:%M %p') | tojson } },
-        location: { { event.location | tojson } },
-        organizer: { { event.organizer.name | tojson } },
+            date: {{ event.date.strftime('%b %d, %Y') | tojson }},
+        time: {{ event.time.strftime('%I:%M %p') | tojson }},
+        location: {{ event.location | tojson }},
+        organizer: {{ event.organizer.name | tojson }},
         detailUrl: "{{ url_for('events.detail', event_id=event.id) }}"
     } {% if not loop.last %}, {% endif %}
     {% endfor %}
